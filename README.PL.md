@@ -11,7 +11,7 @@ ARM What-If dla init/deploy/services, plan wywołań dla remediacji i natywny Po
 ## Etapy
 
 | Krok | Cel | Pipeline |
-|---|---|---|
+| --- | --- | --- |
 | 0 | Tożsamość pipeline'u i Service Connection | Konfiguracja ręczna poniżej |
 | 1 | **init**: RG, tożsamość BYO i Monitoring Reader | [amba_init.yml](.pipelines/amba_init.yml) |
 | 2 | **deploy**: oficjalne AMBA-ALZ i uprawnienia operatora BYO | [amba_deploy.yml](.pipelines/amba_deploy.yml) |
@@ -29,7 +29,7 @@ ARM What-If dla init/deploy/services, plan wywołań dla remediacji i natywny Po
 ## Konfiguracja
 
 | Plik | Co ustawiasz |
-|---|---|
+| --- | --- |
 | `configuration/ado-env.yml` | Pula agentów (`devops_runner_pool_name`) i Service Connection (`devops_service_connection_name`). |
 | `configuration/alzArm.param.json` | Parametry AMBA. Init czyta z niego subskrypcję Management, region, nazwę UAMI (`userAssignedManagedIdentityName`) i `enterpriseScaleCompanyPrefix`. |
 | `configuration/amba.yaml` | `init`: nazwa RG tożsamości, lock, tagi i role dla UAMI, opcjonalnie `pseudoRootManagementGroupId`. `deploy`: tag release'u AMBA i nazwa wdrożenia. `services`: grupy zarządzania dla polityk usług. `remediate`: ustawienia opcjonalne. |
@@ -42,7 +42,7 @@ Każdy plik ma przykład z wartościami zastępczymi: `ado-env.example.yml`, `al
 ## Dwie tożsamości: nie myl ich
 
 | | Tożsamość pipeline'u | Tożsamość AMBA |
-|---|---|---|
+| --- | --- | --- |
 | Do czego | Wdraża: uruchamia init, deploy, remediate, cleanup | Używana przez reguły alertów log-search AMBA w czasie działania do odczytu danych (Azure Resource Graph: tagi, nadpisania progów) |
 | Kto tworzy | Ty, ręcznie (krok 0) | Krok init |
 | Uprawnienia | Zapis: Contributor, Locks Contributor, RBAC Administrator (z warunkiem), role polityk | Tylko odczyt: **Monitoring Reader** na pseudo root MG |

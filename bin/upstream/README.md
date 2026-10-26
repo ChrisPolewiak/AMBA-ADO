@@ -1,7 +1,7 @@
 # Official AMBA scripts
 
 | Source | Value |
-|---|---|
+| --- | --- |
 | Repository | [Azure/azure-monitor-baseline-alerts](https://github.com/Azure/azure-monitor-baseline-alerts) |
 | Directory | `patterns/alz/scripts` |
 | Reference | `main`, snapshot retrieved 2026-10-23 |
@@ -24,7 +24,7 @@ Pipelines execute local copies without downloading scripts.
 4. Preview before executing remediation or cleanup.
 
 | Version rule | Requirement |
-|---|---|
+| --- | --- |
 | `deploy.releaseTag` | Must match the reference or commit in `source.json` |
 | Deployment repository | Must match the recorded official source |
 | Reproducibility | Pin deploy to the recorded commit; `main` is moving while these scripts are a fixed snapshot |

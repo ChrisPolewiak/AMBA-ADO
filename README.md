@@ -11,7 +11,7 @@ ARM What-If for init/deploy/services, an execution plan for remediation, and nat
 ## Steps
 
 | Step | Purpose | Pipeline |
-|---|---|---|
+| --- | --- | --- |
 | 0 | Pipeline identity and Service Connection | Manual setup below |
 | 1 | **init**: RG, BYO identity and Monitoring Reader | [amba_init.yml](.pipelines/amba_init.yml) |
 | 2 | **deploy**: official AMBA-ALZ and BYO operator permissions | [amba_deploy.yml](.pipelines/amba_deploy.yml) |
