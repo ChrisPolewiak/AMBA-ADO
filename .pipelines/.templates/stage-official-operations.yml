@@ -1,0 +1,40 @@
+parameters:
+- name: operation
+  type: string
+  values: [remediate, cleanup]
+- name: deployMode
+  type: string
+  default: whatif
+- name: skipValidation
+  type: boolean
+  default: false
+- name: cleanItems
+  type: string
+  default: Alerts
+
+stages:
+- stage: Validate
+  displayName: 'Official AMBA preview / execution plan'
+  condition: and(not(canceled()), or(eq('${{ parameters.deployMode }}', 'whatif'), eq('${{ parameters.skipValidation }}', 'False')))
+  jobs:
+  - job: Preview
+    steps:
+    - template: official-operation-step.yml
+      parameters:
+        operation: ${{ parameters.operation }}
+        deployMode: whatif
+        cleanItems: ${{ parameters.cleanItems }}
+
+- ${{ if eq(parameters.deployMode, 'deploy') }}:
+  - stage: Deploy
+    displayName: 'Execute official AMBA script'
+    dependsOn: Validate
+    condition: and(not(canceled()), or(eq(dependencies.Validate.result, 'Succeeded'), and(eq('${{ parameters.skipValidation }}', 'True'), eq(dependencies.Validate.result, 'Skipped'))))
+    jobs:
+    - job: Execute
+      steps:
+      - template: official-operation-step.yml
+        parameters:
+          operation: ${{ parameters.operation }}
+          deployMode: deploy
+          cleanItems: ${{ parameters.cleanItems }}

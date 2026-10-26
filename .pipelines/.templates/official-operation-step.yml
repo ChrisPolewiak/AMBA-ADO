@@ -1,0 +1,20 @@
+parameters:
+- name: operation
+  type: string
+- name: deployMode
+  type: string
+- name: cleanItems
+  type: string
+
+steps:
+- checkout: self
+  fetchDepth: 1
+- task: AzurePowerShell@5
+  displayName: 'AMBA ${{ parameters.operation }} (${{ parameters.deployMode }})'
+  inputs:
+    azureSubscription: '$(devops_service_connection_name)'
+    ScriptType: FilePath
+    ScriptPath: 'bin/Invoke-AMBAOperation.ps1'
+    ScriptArguments: '-Operation ${{ parameters.operation }} -DeployMode ${{ parameters.deployMode }} -CleanItems ${{ parameters.cleanItems }}'
+    azurePowerShellVersion: LatestVersion
+    pwsh: true

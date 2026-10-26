@@ -1,0 +1,42 @@
+parameters:
+- name: scriptPath
+  type: string
+  default: ''
+
+stages:
+- stage: CheckVariables
+  displayName: 'Check Required Variables'
+  jobs:
+  - job: ValidateInputs
+    displayName: 'Validate Pipeline Inputs'
+    steps:
+    - checkout: self
+      fetchDepth: 1
+    - bash: |
+        echo "Checking required inputs..."
+        ERRORS=0
+        SCRIPT_PATH='${{ parameters.scriptPath }}'
+        SCRIPT_FILE="bin/${SCRIPT_PATH}"
+
+        if [ -z "$SCRIPT_PATH" ]; then
+          echo "##vso[task.logissue type=error]Parameter 'scriptPath' is not set!"
+          ERRORS=$((ERRORS + 1))
+        elif [ ! -f "$SCRIPT_FILE" ]; then
+          echo "##vso[task.logissue type=error]Script '$SCRIPT_FILE' does not exist in the repository!"
+          ERRORS=$((ERRORS + 1))
+        else
+          echo "script file found: $SCRIPT_FILE"
+        fi
+
+        if [ -z "${DEVOPS_SERVICE_CONNECTION:-}" ] || [[ "${DEVOPS_SERVICE_CONNECTION}" == CHANGE-ME* ]]; then
+          echo "##vso[task.logissue type=error]devops_service_connection_name is not configured in configuration/ado-env.yml"
+          ERRORS=$((ERRORS + 1))
+        fi
+
+        if [ $ERRORS -gt 0 ]; then
+          echo "##vso[task.complete result=Failed;]Validation failed with $ERRORS error(s)"
+          exit 1
+        fi
+      displayName: 'Validate Inputs'
+      env:
+        DEVOPS_SERVICE_CONNECTION: $(devops_service_connection_name)

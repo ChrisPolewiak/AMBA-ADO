@@ -1,0 +1,44 @@
+parameters:
+- name: scriptPath
+  type: string
+  default: ''
+- name: scriptArgs
+  type: string
+  default: ''
+- name: skipValidation
+  type: boolean
+  default: false
+
+stages:
+- stage: Validate
+  displayName: 'Validation What-If Stage'
+  dependsOn:
+    - CheckVariables
+  condition: and(succeeded(), eq('${{ parameters.skipValidation }}', false))
+  jobs:
+  - job: ValidateDeployment
+    displayName: 'Validate Deployment (What-If)'
+    steps:
+    - checkout: self
+      fetchDepth: 2
+    - task: AzureCLI@2
+      displayName: 'Run script in What-If mode'
+      inputs:
+        visibleAzLogin: false
+        azureSubscription: '$(devops_service_connection_name)'
+        scriptType: bash
+        scriptLocation: inlineScript
+        inlineScript: |
+          set -o pipefail
+          outputFile="$(Agent.TempDirectory)/WhatIfOutput.txt"
+          scriptFile="bin/${{ parameters.scriptPath }}"
+          echo "Running: ${scriptFile} -deployMode whatif ${{ parameters.scriptArgs }}"
+          chmod +x "${scriptFile}" || true
+          rc=0
+          "./${scriptFile}" -deployMode whatif ${{ parameters.scriptArgs }} 2>&1 | tee "$outputFile" || rc=$?
+          echo "##vso[task.uploadfile]$outputFile"
+          exit $rc
+      env:
+        PIPELINE_NAME: "$(System.TeamProject)/$(Build.DefinitionName)"
+        PIPELINE_BUILDNUMBER: "$(Build.BuildNumber)"
+        PIPELINE_ID: "$(System.DefinitionId)"

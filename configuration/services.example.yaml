@@ -1,0 +1,187 @@
+# EXAMPLE - copy to services.yaml and adjust.
+# AMBA services - alert policies for additional Azure services (step 3, bin/amba_services.sh).
+# The list is taken from the folder "services" of the AMBA repository, release 2026-06-03.
+# Switch a service on or off with "enabled". Default: false. Only services with enabled: true are deployed.
+# A service deploys ALL its alerts, unless you narrow it down with the optional keys below.
+#
+# Keys per service:
+#   path: Network/applicationGateways  required; folder relative to services/ in the AMBA release
+#   enabled: false                    true = deploy this service; false/omitted = skip
+#   include: [AzwafSecRule]          alert names to deploy (as on the service page); empty = all
+#   exclude: [CurrentConnections]    alert names to skip; takes precedence over include
+#   assignmentManagementGroupId: ""  management group of the assignments (default: services.assignmentManagementGroupId
+#                                    in amba.yaml, then LandingZoneManagementGroup)
+#   parameters:                      policy parameters for all alerts of the service, e.g.
+#     severity: 2
+#   overrides:                       policy parameters for one alert, e.g.
+#     AzwafSecRule:
+#       threshold: 100
+#
+# Example entry under services (optional settings do not change the entries below):
+#   - path: Network/applicationGateways
+#     enabled: true
+#     include: [AzwafSecRule]
+#     exclude: []
+#     assignmentManagementGroupId: your-management-group-id
+#     parameters:
+#       severity: 2
+#     overrides:
+#       AzwafSecRule:
+#         threshold: 100
+# Use parameter names supported by the selected alert policy; overrides take precedence
+# over service-level parameters. Omit include/exclude to select all alerts.
+# Service pages: https://azure.github.io/azure-monitor-baseline-alerts/services/
+# The list changes between AMBA releases: after changing deploy.releaseTag check the "services" folder of the release.
+services:
+  - path: AVS/privateClouds
+    enabled: false
+  - path: AnalysisServices/servers
+    enabled: false
+  - path: ApiManagement/service
+    enabled: false
+  - path: App/containerApps
+    enabled: false
+  - path: AppConfiguration/configurationStores
+    enabled: false
+  - path: Automation/automationAccounts
+    enabled: false
+  - path: Batch/batchAccounts
+    enabled: false
+  - path: Cache/Redis
+    enabled: false
+  - path: Cdn/profiles
+    enabled: false
+  - path: CognitiveServices/accounts
+    enabled: false
+  - path: Compute/cloudServices
+    enabled: false
+  - path: Compute/virtualMachineScaleSets
+    enabled: false
+  - path: Compute/virtualMachines
+    enabled: false
+  - path: ContainerInstance/containerGroups
+    enabled: false
+  - path: ContainerRegistry/registries
+    enabled: false
+  - path: ContainerService/managedClusters
+    enabled: false
+  - path: DBforMariaDB/servers
+    enabled: false
+  - path: DBforMySQL/flexibleServers
+    enabled: false
+  - path: DBforMySQL/servers
+    enabled: false
+  - path: DBforPostgreSQL/flexibleServers
+    enabled: false
+  - path: DBforPostgreSQL/servers
+    enabled: false
+  - path: DataFactory/factories
+    enabled: false
+  - path: DesktopVirtualization/hostPools
+    enabled: false
+  - path: Devices/IotHubs
+    enabled: false
+  - path: DocumentDB/databaseAccounts
+    enabled: false
+  - path: EventGrid/domains
+    enabled: false
+  - path: EventGrid/systemTopics
+    enabled: false
+  - path: EventGrid/topics
+    enabled: false
+  - path: EventHub/clusters
+    enabled: false
+  - path: EventHub/namespaces
+    enabled: false
+  - path: HealthcareApis/services
+    enabled: false
+  - path: HybridCompute/machines
+    enabled: false
+  - path: KeyVault/vaults
+    enabled: false
+  - path: Kusto/clusters
+    enabled: false
+  - path: Logic/workflows
+    enabled: false
+  - path: MachineLearningServices/workspaces
+    enabled: false
+  - path: Media/mediaservices
+    enabled: false
+  - path: NetApp/netAppAccounts
+    enabled: false
+  - path: Network/applicationGateways
+    enabled: false
+  - path: Network/azureFirewalls
+    enabled: false
+  - path: Network/bastionHosts
+    enabled: false
+  - path: Network/connections
+    enabled: false
+  - path: Network/dnszones
+    enabled: false
+  - path: Network/expressRouteCircuits
+    enabled: false
+  - path: Network/expressRouteGateways
+    enabled: false
+  - path: Network/expressRoutePorts
+    enabled: false
+  - path: Network/frontDoors
+    enabled: false
+  - path: Network/loadBalancers
+    enabled: false
+  - path: Network/natGateways
+    enabled: false
+  - path: Network/networkSecurityGroups
+    enabled: false
+  - path: Network/networkWatchers
+    enabled: false
+  - path: Network/privateDnsZones
+    enabled: false
+  - path: Network/publicIPAddresses
+    enabled: false
+  - path: Network/routeTables
+    enabled: false
+  - path: Network/trafficmanagerprofiles
+    enabled: false
+  - path: Network/virtualNetworkGateways
+    enabled: false
+  - path: Network/virtualNetworks
+    enabled: false
+  - path: Network/vpnGateways
+    enabled: false
+  - path: OperationalInsights/workspaces
+    enabled: false
+  - path: PowerBIDedicated/capacities
+    enabled: false
+  - path: RecoveryServices/vaults
+    enabled: false
+  - path: Relay/namespaces
+    enabled: false
+  - path: Resources/subscriptions
+    enabled: false
+  - path: Search/searchServices
+    enabled: false
+  - path: ServiceBus/namespaces
+    enabled: false
+  - path: SignalRService/SignalR
+    enabled: false
+  - path: Sql/managedInstances
+    enabled: false
+  - path: Sql/servers
+    enabled: false
+  - path: Storage/storageAccounts
+    enabled: false
+  - path: StorageCache/AmlFilesystems
+    enabled: false
+  - path: StorageSync/storageSyncServices
+    enabled: false
+  - path: StreamAnalytics/streamingjobs
+    enabled: false
+  - path: Synapse/workspaces
+    enabled: false
+  - path: Web/hostingEnvironments
+    enabled: false
+  - path: Web/serverFarms
+    enabled: false
+  - path: Web/sites
+    enabled: false

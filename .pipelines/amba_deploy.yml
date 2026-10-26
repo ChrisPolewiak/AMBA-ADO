@@ -1,0 +1,37 @@
+trigger: none
+pr: none
+
+parameters:
+- name: deployMode
+  type: string
+  default: whatif
+  values:
+  - whatif
+  - deploy
+  displayName: 'Mode: whatif = preview only, deploy = preview and deployment'
+- name: skipValidation
+  type: boolean
+  default: false
+  displayName: 'Skip the What-If stage (only for deployMode=deploy)'
+
+# Pool name and Service Connection come from the environment file
+variables:
+- template: ../configuration/ado-env.yml
+
+pool:
+  name: '$(devops_runner_pool_name)'
+
+stages:
+- template: .templates/stage-check-variables.yml
+  parameters:
+    scriptPath: amba_deploy.sh
+
+- template: .templates/stage-validate-whatif.yml
+  parameters:
+    scriptPath: amba_deploy.sh
+    skipValidation: ${{ parameters.skipValidation }}
+
+- ${{ if eq(parameters.deployMode, 'deploy') }}:
+  - template: .templates/stage-deploy.yml
+    parameters:
+      scriptPath: amba_deploy.sh

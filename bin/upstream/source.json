@@ -1,0 +1,7 @@
+{
+  "repository": "https://github.com/Azure/azure-monitor-baseline-alerts",
+  "ref": "main",
+  "commit": "ec5e5f3acfcdc52773110517b1f51bd06cf766de",
+  "path": "patterns/alz/scripts",
+  "retrieved": "2026-10-23"
+}

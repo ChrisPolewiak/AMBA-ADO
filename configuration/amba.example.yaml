@@ -1,0 +1,98 @@
+# EXAMPLE - copy to amba.yaml and adjust. Do not put environment-specific data in this file.
+# AMBA - settings used by the pipelines and scripts of this repository.
+# Values that AMBA itself needs (subscription, region, identity name, management groups, initiatives)
+# are NOT repeated here - they live in configuration/alzArm.param.json.
+
+# ---------------------------------------------------------------------------
+# init: resource group + user-assigned managed identity (bin/amba_init.sh)
+# ---------------------------------------------------------------------------
+init:
+  # Pseudo root management group where roles are assigned to the identity.
+  # Leave empty to use enterpriseScaleCompanyPrefix from alzArm.param.json.
+  pseudoRootManagementGroupId: ""
+
+  # Tags added to the resource group and the identity (pipeline tags are added automatically)
+  tags:
+    managedBy: amba-pipeline
+
+  # NAME OF THE IDENTITY (UAMI) is NOT set here. It comes from configuration/alzArm.param.json:
+  #   userAssignedManagedIdentityName   -> name of the identity created by init
+  #   managementSubscriptionId          -> subscription where the resource group and the identity are created
+  #   ALZMonitorResourceGroupLocation   -> region of the resource group and the identity
+  # (AMBA ignores userAssignedManagedIdentityName when bringYourOwnUserAssignedManagedIdentity = Yes,
+  #  so init reuses it as the single place where the name is defined.)
+  # The identity is created in the resource group below. After init, set in configuration/alzArm.param.json:
+  #   bringYourOwnUserAssignedManagedIdentity           = Yes
+  #   bringYourOwnUserAssignedManagedIdentityResourceId = <Resource ID printed at the end of amba_init.sh>
+
+  # Resource group that holds the identity (separate from the resource group AMBA creates for its alerts)
+  resourceGroup:
+    name: rg-amba-identity
+    # Lock protects the identity from accidental deletion. The cleanup pipeline removes it first.
+    # kind: CanNotDelete | ReadOnly | None  (leave lock empty "{}" for no lock)
+    lock:
+      kind: CanNotDelete
+      notes: AMBA user-assigned managed identity (bring your own). Removed by the AMBA cleanup pipeline.
+    tags: {}
+
+  # Roles assigned to the identity at the pseudo root management group
+  pseudoRootRoleAssignments:
+    # Needed by log-search alerts to query Azure Resource Graph (resource tags, threshold overrides)
+    - roleName: Monitoring Reader
+      roleDefinitionId: 43d0d8ad-25c7-4714-9337-8ba259a9fe05
+
+# ---------------------------------------------------------------------------
+# deploy: AMBA-ALZ from an official release (bin/amba_deploy.sh)
+# ---------------------------------------------------------------------------
+deploy:
+  # Release (git tag) of https://github.com/Azure/azure-monitor-baseline-alerts to deploy, e.g. "2026-06-03".
+  # The template is deployed from this tag and is not copied into this repository.
+  # Pin the tag: changing it upgrades AMBA (run the pipeline with whatif first).
+  releaseTag: "2026-06-03"
+
+  # Optional: base address of the AMBA repository (default: https://raw.githubusercontent.com/Azure/azure-monitor-baseline-alerts).
+  # Change it only for a mirror. The template needs a public address: it loads linked templates relative to it.
+  # templateBaseUri: ""
+
+  # Name of the ARM deployment at the pseudo root management group
+  deploymentName: amba-alz
+
+  # Pipeline tags (pipelineName, pipelineId, pipelineBuild) added to the tags of the AMBA resource group.
+  # AMBA also passes these tags to the alert rules its policies create, so a changing value (pipelineBuild changes
+  # on every run) shows up as a change of the policy assignment parameters in every What-If.
+  # Remove "pipelineBuild" below to keep the tags stable between runs; an empty list [] adds no pipeline tags.
+  pipelineTags:
+    - pipelineName
+    - pipelineId
+    - pipelineBuild
+
+  # With "bring your own" identity AMBA does not give its policy assignments the Managed Identity Operator role
+  # on the identity. The deploy step does it for the system-assigned identities of these assignments.
+  managedIdentityOperatorAssignments:
+    - Deploy-AMBA-VM
+    - Deploy-AMBA-HybridVM
+    - Deploy-AMBA-VMSS
+    - Deploy-AMBA-Management
+    - Deploy-AMBA-Web
+
+# ---------------------------------------------------------------------------
+# services: alert policies for additional Azure services (bin/amba_services.sh)
+# The list of services (enabled: true/false) is in configuration/services.yaml.
+# ---------------------------------------------------------------------------
+services:
+  # Management group for the policy definitions. Must be above every assignment scope.
+  # Default: the pseudo root management group.
+  # definitionManagementGroupId: ""
+
+  # Default management group for the policy assignments. Default: LandingZoneManagementGroup from alzArm.param.json.
+  # assignmentManagementGroupId: ""
+
+# Step 4: remediate. Everything is optional, defaults work for the standard deployment.
+remediate:
+  # Which policy assignments are remediated: names of AMBA assignments (deploy) and of services (amba-x-...).
+  # assignmentNamePattern: "^(Deploy-AMBA-|amba-x-)"
+  # include: []            # only these assignment names; empty = all found
+  # exclude: []            # skip these assignment names
+  # Official Start-AMBA-ALZ-Remediation.ps1 creates the tasks; check results in Azure Policy.
+  # Notification assets / health initiatives are submitted first. Internal waits follow upstream.
+  # managementGroups: []       # additional management groups to look at (default: from alzArm.param.json and services)

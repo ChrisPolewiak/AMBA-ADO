@@ -1,0 +1,7 @@
+# Environment specific settings used by all AMBA pipelines.
+# This is the only file that has to be adjusted per environment / client - the pipeline definitions stay unchanged.
+variables:
+  # Name of the Azure DevOps agent pool that runs the pipelines
+  devops_runner_pool_name: 'CHANGE-ME-agent-pool'
+  # Name of the Azure DevOps Service Connection (Azure Resource Manager) used by the pipelines
+  devops_service_connection_name: 'CHANGE-ME-service-connection'

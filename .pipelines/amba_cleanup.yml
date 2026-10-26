@@ -1,0 +1,45 @@
+trigger: none
+pr: none
+
+parameters:
+- name: cleanItems
+  type: string
+  default: Alerts
+  values:
+  - Alerts
+  - OrphanedAlerts
+  - NotificationAssets
+  - PolicyAssignments
+  - RoleAssignments
+  - PolicyDefinitions
+  - Deployments
+  - OldNotificationAssets
+  - LegacySH
+  - Amba-Alz
+  displayName: 'Official AMBA cleanup operation (Amba-Alz = full upstream cleanup)'
+- name: deployMode
+  type: string
+  default: whatif
+  values:
+  - whatif
+  - deploy
+  displayName: 'Mode: whatif = list what would be removed, deploy = list and REMOVE'
+- name: skipValidation
+  type: boolean
+  default: false
+  displayName: 'Skip the What-If stage (only for deployMode=deploy)'
+
+# Pool name and Service Connection come from the environment file
+variables:
+- template: ../configuration/ado-env.yml
+
+pool:
+  name: '$(devops_runner_pool_name)'
+
+stages:
+- template: .templates/stage-official-operations.yml
+  parameters:
+    operation: cleanup
+    cleanItems: ${{ parameters.cleanItems }}
+    deployMode: ${{ parameters.deployMode }}
+    skipValidation: ${{ parameters.skipValidation }}

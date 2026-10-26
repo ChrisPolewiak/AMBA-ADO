@@ -1,0 +1,41 @@
+parameters:
+- name: scriptPath
+  type: string
+  default: ''
+- name: scriptArgs
+  type: string
+  default: ''
+
+stages:
+- stage: Deploy
+  displayName: 'Deployment Stage'
+  dependsOn:
+    - CheckVariables
+    - Validate
+  condition: |
+    and(
+      eq(dependencies.CheckVariables.result, 'Succeeded'),
+      or(
+        eq(dependencies.Validate.result, 'Succeeded'),
+        eq(dependencies.Validate.result, 'Skipped')
+      )
+    )
+  jobs:
+  - job: ActualDeployment
+    displayName: 'Execute Actual Deployment'
+    steps:
+    - checkout: self
+      fetchDepth: 2
+    - task: AzureCLI@2
+      displayName: 'Deploy to Azure'
+      inputs:
+        visibleAzLogin: false
+        azureSubscription: '$(devops_service_connection_name)'
+        scriptType: bash
+        scriptLocation: scriptPath
+        scriptPath: 'bin/${{ parameters.scriptPath }}'
+        arguments: '-deployMode deploy ${{ parameters.scriptArgs }}'
+      env:
+        PIPELINE_NAME: "$(System.TeamProject)/$(Build.DefinitionName)"
+        PIPELINE_BUILDNUMBER: "$(Build.BuildNumber)"
+        PIPELINE_ID: "$(System.DefinitionId)"

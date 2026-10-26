@@ -1,0 +1,6 @@
+# Local outputs of the bin/ scripts
+whatif_outputs/
+lint_outputs/
+
+# Notatki wewnętrzne
+internal/

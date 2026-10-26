@@ -1,0 +1,12 @@
+# Ustawienia domyślne
+* text=auto
+
+# Wymuszenie LF dla skryptów i YAML
+*.sh text eol=lf
+*.bicep text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
+*.ps1 text eol=crlf
+*.cmd text eol=crlf
+*.bat text eol=crlf
