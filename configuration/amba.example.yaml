@@ -48,7 +48,7 @@ deploy:
   # Release (git tag) of https://github.com/Azure/azure-monitor-baseline-alerts to deploy, e.g. "2026-06-03".
   # The template is deployed from this tag and is not copied into this repository.
   # Pin the tag: changing it upgrades AMBA (run the pipeline with whatif first).
-  releaseTag: "2026-06-03"
+  releaseTag: "main"
 
   # Optional: base address of the AMBA repository (default: https://raw.githubusercontent.com/Azure/azure-monitor-baseline-alerts).
   # Change it only for a mirror. The template needs a public address: it loads linked templates relative to it.
